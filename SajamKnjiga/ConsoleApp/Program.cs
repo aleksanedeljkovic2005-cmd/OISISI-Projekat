@@ -1,11 +1,14 @@
-﻿namespace ConsoleApp
+﻿using Core.DAO;
+using Core.Models;
+
+namespace ConsoleApp
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
             Console.OutputEncoding = System.Text.Encoding.UTF8;
+            
             bool radi = true;
             while (radi)
             {
