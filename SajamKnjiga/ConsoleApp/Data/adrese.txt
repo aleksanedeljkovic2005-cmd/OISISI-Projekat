@@ -1,0 +1,3 @@
+﻿1|Bulevar oslobođenja|12|Novi Sad|Srbija
+2|Knez Mihailova|5a|Beograd|Srbija
+3|Trg slobode|1|Subotica|Srbija

@@ -11,4 +11,16 @@
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\adrese.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\autori.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\knjige.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

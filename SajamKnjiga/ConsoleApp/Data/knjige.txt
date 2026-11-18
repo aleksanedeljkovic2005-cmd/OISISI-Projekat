@@ -1,0 +1,3 @@
+﻿1|978-86-001|Na Drini ćuprija|Roman|1945|1200.50|350|1|1||
+2|978-86-002|Prokleta avlija|Roman|1954|900|150|1|1|1|2
+3|978-86-003|Tražim pomilovanje|Poezija|1964|750|120|2|2||1

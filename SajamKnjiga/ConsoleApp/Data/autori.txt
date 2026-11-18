@@ -1,0 +1,2 @@
+﻿1|Ivo|Andrić|1892-10-09|1|0601234567|ivo@mail.com|123456789|40|1,2
+2|Desanka|Maksimović|1898-05-16|2|0612345678|desanka@mail.com|987654321|50|3
