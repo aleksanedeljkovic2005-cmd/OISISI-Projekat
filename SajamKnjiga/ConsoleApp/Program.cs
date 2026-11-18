@@ -1,5 +1,6 @@
 ﻿using Core.DAO;
 using Core.Models;
+using ConsoleApp.Meniji;
 
 namespace ConsoleApp
 {
@@ -26,7 +27,7 @@ namespace ConsoleApp
 
                 switch (izbor)
                 {
-                    case "1": Console.WriteLine("Izabrali ste Posetioce."); break;
+                    case "1": new PosetilacMeni().Pokreni(); break;
                     case "2": Console.WriteLine("Izabrali ste Autore."); break;
                     case "3": Console.WriteLine("Izabrali ste Knjige."); break;
                     case "4": Console.WriteLine("Izabrali ste Kupovine."); break;
