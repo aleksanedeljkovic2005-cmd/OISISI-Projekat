@@ -32,7 +32,7 @@ namespace ConsoleApp.Meniji
                     case "1": Prikazi(); break;
                     case "2": Dodaj(); break;
                     case "3": Izmeni(); break;
-                    case "4": Console.WriteLine("Još nije urađeno."); break;
+                    case "4": Obrisi(); break;
                     case "0": radi = false; break;
                     default: Console.WriteLine("Nepostojeća opcija, pokušajte ponovo."); break;
                 }
@@ -141,6 +141,44 @@ namespace ConsoleApp.Meniji
                 AzurirajProsek(p);
 
             Console.WriteLine("Kupovina je uspešno izmenjena.");
+        }
+        private void Obrisi()
+        {
+            Prikazi();
+            int id = Unos.CeoBroj("Unesite ID kupovine za brisanje (0 - odustani): ", 0, int.MaxValue);
+            if (id == 0)
+                return;
+
+            Kupovina? k = kupovinaDAO.NadjiPoId(id);
+            if (k == null)
+            {
+                Console.WriteLine("Kupovina sa tim ID-jem ne postoji.");
+                return;
+            }
+
+            if (Unos.Tekst("Da li ste sigurni? (da/ne): ").ToLower() != "da")
+            {
+                Console.WriteLine("Brisanje otkazano.");
+                return;
+            }
+
+            kupovinaDAO.Obrisi(k.Id);
+
+            Posetilac? p = posetilacDAO.NadjiPoId(k.PosetilacId);
+            if (p != null)
+            {
+                p.KupovineIds.Remove(k.Id);
+                AzurirajProsek(p);
+            }
+
+            Knjiga? knjiga = knjigaDAO.NadjiPoId(k.KnjigaId);
+            if (knjiga != null)
+            {
+                knjiga.KupciIds.Remove(k.PosetilacId);
+                knjigaDAO.Izmeni(knjiga);
+            }
+
+            Console.WriteLine("Kupovina je obrisana.");
         }
     }
 }
