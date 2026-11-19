@@ -32,7 +32,7 @@ namespace ConsoleApp.Meniji
                 {
                     case "1":Prikazi();break;
                     case "2":Dodaj(); break;
-                    case "3":Console.WriteLine("Još nije urađeno.");break;
+                    case "3":Izmeni();break;
                     case "4":Console.WriteLine("Još nije urađeno.");break;
                     case "0":radi = false;break;
                     default:Console.WriteLine("Nepostojeća opcija, pokušajte ponovo.");break;
@@ -101,6 +101,58 @@ namespace ConsoleApp.Meniji
             posetilacDAO.Dodaj(posetilac);
 
             Console.WriteLine($"Posetilac je uspešno dodat (ID: {posetilac.Id}).");
+        }
+        private void Izmeni()
+        {
+            Prikazi();
+            int id = Unos.CeoBroj("Unesite ID posetioca za izmenu (0 - odustani): ", 0, int.MaxValue);
+            if (id == 0)
+                return;
+
+            Posetilac? p = posetilacDAO.NadjiPoId(id);
+            if (p == null)
+            {
+                Console.WriteLine("Posetilac sa tim ID-jem ne postoji.");
+                return;
+            }
+
+            Console.WriteLine("Pritisnite Enter da zadržite trenutnu vrednost.");
+            p.Ime = Unos.TekstIzmena("Ime", p.Ime);
+            p.Prezime = Unos.TekstIzmena("Prezime", p.Prezime);
+            p.DatumRodjenja = Unos.DatumIzmena("Datum rođenja", p.DatumRodjenja);
+            p.Telefon = Unos.TekstIzmena("Telefon", p.Telefon);
+            p.Email = Unos.EmailIzmena("Email", p.Email);
+
+            Adresa? adresa = adresaDAO.NadjiPoId(p.AdresaId);
+            if (adresa == null)
+            {
+                adresa = new Adresa();
+                adresaDAO.Dodaj(adresa);
+                p.AdresaId = adresa.Id;
+            }
+            Console.WriteLine("Adresa:");
+            adresa.Ulica = Unos.TekstIzmena("  Ulica", adresa.Ulica);
+            adresa.Broj = Unos.TekstIzmena("  Broj", adresa.Broj);
+            adresa.Grad = Unos.TekstIzmena("  Grad", adresa.Grad);
+            adresa.Drzava = Unos.TekstIzmena("  Država", adresa.Drzava);
+            adresaDAO.Izmeni(adresa);
+
+            p.BrojClanskeKarte = Unos.TekstIzmena("Broj članske karte", p.BrojClanskeKarte);
+            p.GodinaClanstva = Unos.CeoBrojIzmena("Godina članstva", p.GodinaClanstva, 1900, DateTime.Now.Year);
+
+            while (true)
+            {
+                string s = Unos.TekstIzmena("Status (R/V)", p.Status.ToString()).ToUpper();
+                if (s == "R" || s == "V")
+                {
+                    p.Status = Enum.Parse<StatusPosetioca>(s);
+                    break;
+                }
+                Console.WriteLine("Unesite R ili V.");
+            }
+
+            posetilacDAO.Izmeni(p);
+            Console.WriteLine("Posetilac je uspešno izmenjen.");
         }
     }
 }
