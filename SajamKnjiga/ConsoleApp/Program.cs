@@ -32,7 +32,7 @@ namespace ConsoleApp
                     case "2": new AutorMeni().Pokreni(); break;
                     case "3": new KnjigaMeni().Pokreni(); break;
                     case "4": new KupovinaMeni().Pokreni(); break;
-                    case "5": Console.WriteLine("Izabrali ste Izdavače."); break;
+                    case "5": new IzdavacMeni().Pokreni(); break;
                     case "0": radi = false;
                               Console.WriteLine("Doviđenja!"); break;
                     default: Console.WriteLine("Nepostojeća opcija, pokušajte ponovo."); break;
