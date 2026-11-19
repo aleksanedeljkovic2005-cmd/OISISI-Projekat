@@ -30,7 +30,7 @@ namespace ConsoleApp
                 {
                     case "1": new PosetilacMeni().Pokreni(); break;
                     case "2": new AutorMeni().Pokreni(); break;
-                    case "3": Console.WriteLine("Izabrali ste Knjige."); break;
+                    case "3": new KnjigaMeni().Pokreni(); break;
                     case "4": new KupovinaMeni().Pokreni(); break;
                     case "5": Console.WriteLine("Izabrali ste Izdavače."); break;
                     case "0": radi = false;

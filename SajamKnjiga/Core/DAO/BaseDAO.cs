@@ -15,7 +15,7 @@ namespace Core.DAO
 
         public List<T> UcitajSve()
         {
-            return lista;
+            return new List<T>(lista);
         }
 
         public void SacuvajSve()
