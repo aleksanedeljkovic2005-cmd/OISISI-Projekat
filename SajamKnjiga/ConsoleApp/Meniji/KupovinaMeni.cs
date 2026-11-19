@@ -30,7 +30,7 @@ namespace ConsoleApp.Meniji
                 switch (Console.ReadLine())
                 {
                     case "1": Prikazi(); break;
-                    case "2": Console.WriteLine("Još nije urađeno."); break;
+                    case "2": Dodaj(); break;
                     case "3": Console.WriteLine("Još nije urađeno."); break;
                     case "4": Console.WriteLine("Još nije urađeno."); break;
                     case "0": radi = false; break;
@@ -73,6 +73,48 @@ namespace ConsoleApp.Meniji
 
             p.ProsecnaOcena = ocene.Count == 0 ? 0 : Math.Round(ocene.Average(), 2);
             posetilacDAO.Izmeni(p);
+        }
+        private void Dodaj()
+        {
+            Console.WriteLine();
+            Console.WriteLine("--- Dodavanje kupovine ---");
+
+            Posetilac? p = posetilacDAO.NadjiPoId(Unos.CeoBroj("ID posetioca: ", 1, int.MaxValue));
+            if (p == null)
+            {
+                Console.WriteLine("Posetilac sa tim ID-jem ne postoji.");
+                return;
+            }
+
+            Knjiga? knjiga = knjigaDAO.NadjiPoId(Unos.CeoBroj("ID knjige: ", 1, int.MaxValue));
+            if (knjiga == null)
+            {
+                Console.WriteLine("Knjiga sa tim ID-jem ne postoji.");
+                return;
+            }
+
+            if (knjiga.KupciIds.Contains(p.Id))
+            {
+                Console.WriteLine("Ovaj posetilac je već kupio ovu knjigu.");
+                return;
+            }
+
+            DateTime datum = Unos.Datum("Datum kupovine");
+            int ocena = Unos.CeoBroj("Ocena (1-5): ", 1, 5);
+            string komentar = Unos.Tekst("Komentar: ");
+
+            Kupovina kupovina = new Kupovina(0, p.Id, knjiga.Id, datum, ocena, komentar);
+            kupovinaDAO.Dodaj(kupovina);
+
+            p.KupovineIds.Add(kupovina.Id);
+            p.ListaZeljaIds.Remove(knjiga.Id);
+            AzurirajProsek(p);
+
+            knjiga.KupciIds.Add(p.Id);
+            knjiga.ListaZeljaIds.Remove(p.Id);
+            knjigaDAO.Izmeni(knjiga);
+
+            Console.WriteLine($"Kupovina je uspešno dodata (ID: {kupovina.Id}).");
         }
     }
 }
