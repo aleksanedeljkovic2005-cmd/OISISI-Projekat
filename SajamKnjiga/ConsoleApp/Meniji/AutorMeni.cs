@@ -7,6 +7,9 @@ namespace ConsoleApp.Meniji
     {
         private readonly AutorDAO autorDAO = new AutorDAO();
         private readonly AdresaDAO adresaDAO = new AdresaDAO();
+        private readonly KnjigaDAO knjigaDAO = new KnjigaDAO();
+        private readonly IzdavacDAO izdavacDAO = new IzdavacDAO();
+        private readonly PosetilacDAO posetilacDAO = new PosetilacDAO();
 
         public void Pokreni()
         {
@@ -19,6 +22,7 @@ namespace ConsoleApp.Meniji
                 Console.WriteLine("1 - Prikaz svih autora");
                 Console.WriteLine("2 - Dodavanje autora");
                 Console.WriteLine("3 - Izmena autora");
+                Console.WriteLine("4 - Brisanje autora");
                 Console.WriteLine("0 - Nazad");
                 Console.Write("Izaberite opciju: ");
 
@@ -29,6 +33,7 @@ namespace ConsoleApp.Meniji
                     case "1": Prikazi(); break;
                     case "2": Dodaj(); break;
                     case "3": Izmeni(); break;
+                    case "4": Obrisi(); break;
                     case "0": radi = false; break;
                     default: Console.WriteLine("Nepostojeća opcija, pokušajte ponovo."); break;
                 }
@@ -129,6 +134,66 @@ namespace ConsoleApp.Meniji
 
             autorDAO.Izmeni(autor);
             Console.WriteLine("Autor je uspešno izmenjen.");
+        }
+
+        private void Obrisi()
+        {
+            Prikazi();
+            int id = Unos.CeoBroj("Unesite ID autora za brisanje (0 - odustani): ", 0, int.MaxValue);
+            if (id == 0)
+                return;
+
+            Autor? autor = autorDAO.NadjiPoId(id);
+            if (autor == null)
+            {
+                Console.WriteLine("Autor sa tim ID-jem ne postoji.");
+                return;
+            }
+
+            // Autor koji je šef izdavača ne sme da se obriše.
+            Izdavac? izdavacSef = izdavacDAO.UcitajSve().FirstOrDefault(i => i.SefId == autor.Id);
+            if (izdavacSef != null)
+            {
+                Console.WriteLine($"Autor ne može biti obrisan jer je šef izdavača \"{izdavacSef.Naziv}\".");
+                Console.WriteLine("Prvo promenite šefa tog izdavača.");
+                return;
+            }
+
+            string potvrda = Unos.Tekst($"Da li ste sigurni da želite da obrišete autora {autor.Ime} {autor.Prezime}? (da/ne): ").ToLower();
+            if (potvrda != "da")
+            {
+                Console.WriteLine("Brisanje otkazano.");
+                return;
+            }
+
+            // Skidamo autora sa svih knjiga.
+            int izmenjeneKnjige = 0;
+            foreach (Knjiga k in knjigaDAO.UcitajSve())
+            {
+                if (k.AutoriIds.Remove(autor.Id))
+                {
+                    knjigaDAO.Izmeni(k);
+                    izmenjeneKnjige++;
+                }
+            }
+
+            // Skidamo autora sa svih izdavača.
+            foreach (Izdavac i in izdavacDAO.UcitajSve())
+            {
+                if (i.AutoriIds.Remove(autor.Id))
+                    izdavacDAO.Izmeni(i);
+            }
+
+            int adresaId = autor.AdresaId;
+            autorDAO.Obrisi(autor.Id);
+
+            // Brišemo adresu samo ako je niko drugi ne koristi.
+            bool adresaSeKoristi = autorDAO.UcitajSve().Any(a => a.AdresaId == adresaId)
+                                || posetilacDAO.UcitajSve().Any(p => p.AdresaId == adresaId);
+            if (!adresaSeKoristi)
+                adresaDAO.Obrisi(adresaId);
+
+            Console.WriteLine($"Autor je obrisan (uklonjen sa {izmenjeneKnjige} knjiga).");
         }
     }
 }
