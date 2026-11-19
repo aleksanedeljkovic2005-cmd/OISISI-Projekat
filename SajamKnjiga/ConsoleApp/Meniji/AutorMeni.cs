@@ -18,6 +18,7 @@ namespace ConsoleApp.Meniji
                 Console.WriteLine("===== AUTORI =====");
                 Console.WriteLine("1 - Prikaz svih autora");
                 Console.WriteLine("2 - Dodavanje autora");
+                Console.WriteLine("3 - Izmena autora");
                 Console.WriteLine("0 - Nazad");
                 Console.Write("Izaberite opciju: ");
 
@@ -27,6 +28,7 @@ namespace ConsoleApp.Meniji
                 {
                     case "1": Prikazi(); break;
                     case "2": Dodaj(); break;
+                    case "3": Izmeni(); break;
                     case "0": radi = false; break;
                     default: Console.WriteLine("Nepostojeća opcija, pokušajte ponovo."); break;
                 }
@@ -82,6 +84,51 @@ namespace ConsoleApp.Meniji
 
             autorDAO.Dodaj(autor);
             Console.WriteLine($"Autor je uspešno dodat (ID: {autor.Id}).");
+        }
+
+        private void Izmeni()
+        {
+            Prikazi();
+            int id = Unos.CeoBroj("Unesite ID autora za izmenu (0 - odustani): ", 0, int.MaxValue);
+            if (id == 0)
+                return;
+
+            Autor? autor = autorDAO.NadjiPoId(id);
+            if (autor == null)
+            {
+                Console.WriteLine("Autor sa tim ID-jem ne postoji.");
+                return;
+            }
+
+            Console.WriteLine("Pritisnite Enter da zadržite trenutnu vrednost.");
+            autor.Ime = Unos.TekstIzmena("Ime", autor.Ime);
+            autor.Prezime = Unos.TekstIzmena("Prezime", autor.Prezime);
+
+            DateTime stariDatum = autor.DatumRodjenja.ToDateTime(TimeOnly.MinValue);
+            autor.DatumRodjenja = DateOnly.FromDateTime(Unos.DatumIzmena("Datum rođenja", stariDatum));
+
+            autor.Telefon = Unos.TekstIzmena("Telefon", autor.Telefon);
+            autor.Email = Unos.EmailIzmena("Email", autor.Email);
+
+            Adresa? adresa = adresaDAO.NadjiPoId(autor.AdresaId);
+            if (adresa == null)
+            {
+                adresa = new Adresa();
+                adresaDAO.Dodaj(adresa);
+                autor.AdresaId = adresa.Id;
+            }
+            Console.WriteLine("Adresa:");
+            adresa.Ulica = Unos.TekstIzmena("  Ulica", adresa.Ulica);
+            adresa.Broj = Unos.TekstIzmena("  Broj", adresa.Broj);
+            adresa.Grad = Unos.TekstIzmena("  Grad", adresa.Grad);
+            adresa.Drzava = Unos.TekstIzmena("  Država", adresa.Drzava);
+            adresaDAO.Izmeni(adresa);
+
+            autor.BrojLicneKarte = Unos.TekstIzmena("Broj lične karte", autor.BrojLicneKarte);
+            autor.GodineIskustva = Unos.CeoBrojIzmena("Godine iskustva", autor.GodineIskustva, 0, 100);
+
+            autorDAO.Izmeni(autor);
+            Console.WriteLine("Autor je uspešno izmenjen.");
         }
     }
 }
