@@ -31,7 +31,7 @@ namespace ConsoleApp.Meniji
                 {
                     case "1": Prikazi(); break;
                     case "2": Dodaj(); break;
-                    case "3": Console.WriteLine("Još nije urađeno."); break;
+                    case "3": Izmeni(); break;
                     case "4": Console.WriteLine("Još nije urađeno."); break;
                     case "0": radi = false; break;
                     default: Console.WriteLine("Nepostojeća opcija, pokušajte ponovo."); break;
@@ -115,6 +115,32 @@ namespace ConsoleApp.Meniji
             knjigaDAO.Izmeni(knjiga);
 
             Console.WriteLine($"Kupovina je uspešno dodata (ID: {kupovina.Id}).");
+        }
+        private void Izmeni()
+        {
+            Prikazi();
+            int id = Unos.CeoBroj("Unesite ID kupovine za izmenu (0 - odustani): ", 0, int.MaxValue);
+            if (id == 0)
+                return;
+
+            Kupovina? k = kupovinaDAO.NadjiPoId(id);
+            if (k == null)
+            {
+                Console.WriteLine("Kupovina sa tim ID-jem ne postoji.");
+                return;
+            }
+
+            Console.WriteLine("Pritisnite Enter da zadržite trenutnu vrednost.");
+            k.DatumKupovine = Unos.DatumIzmena("Datum kupovine", k.DatumKupovine);
+            k.Ocena = Unos.CeoBrojIzmena("Ocena (1-5)", k.Ocena, 1, 5);
+            k.Komentar = Unos.TekstIzmena("Komentar", k.Komentar);
+            kupovinaDAO.Izmeni(k);
+
+            Posetilac? p = posetilacDAO.NadjiPoId(k.PosetilacId);
+            if (p != null)
+                AzurirajProsek(p);
+
+            Console.WriteLine("Kupovina je uspešno izmenjena.");
         }
     }
 }
