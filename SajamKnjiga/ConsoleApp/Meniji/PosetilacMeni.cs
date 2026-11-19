@@ -10,6 +10,8 @@ namespace ConsoleApp.Meniji
     {
         private readonly PosetilacDAO posetilacDAO = new PosetilacDAO();
         private readonly AdresaDAO adresaDAO = new AdresaDAO();
+        private readonly KupovinaDAO kupovinaDAO = new KupovinaDAO();
+
 
         public void Pokreni()
         {
@@ -33,7 +35,7 @@ namespace ConsoleApp.Meniji
                     case "1":Prikazi();break;
                     case "2":Dodaj(); break;
                     case "3":Izmeni();break;
-                    case "4":Console.WriteLine("Još nije urađeno.");break;
+                    case "4":Obrisi();break;
                     case "0":radi = false;break;
                     default:Console.WriteLine("Nepostojeća opcija, pokušajte ponovo.");break;
                 }
@@ -153,6 +155,42 @@ namespace ConsoleApp.Meniji
 
             posetilacDAO.Izmeni(p);
             Console.WriteLine("Posetilac je uspešno izmenjen.");
+        }
+        private void Obrisi()
+        {
+            Prikazi();
+            int id = Unos.CeoBroj("Unesite ID posetioca za brisanje (0 - odustani): ", 0, int.MaxValue);
+            if (id == 0)
+                return;
+
+            Posetilac? p = posetilacDAO.NadjiPoId(id);
+            if (p == null)
+            {
+                Console.WriteLine("Posetilac sa tim ID-jem ne postoji.");
+                return;
+            }
+
+            string potvrda = Unos.Tekst($"Da li ste sigurni da želite da obrišete posetioca {p.Ime} {p.Prezime}? (da/ne): ").ToLower();
+            if (potvrda != "da")
+            {
+                Console.WriteLine("Brisanje otkazano.");
+                return;
+            }
+
+            List<Kupovina> njegoveKupovine = kupovinaDAO.UcitajSve()
+                .Where(k => k.PosetilacId == p.Id)
+                .ToList();
+            foreach (Kupovina k in njegoveKupovine)
+                kupovinaDAO.Obrisi(k.Id);
+
+            
+            int adresaId = p.AdresaId;
+            posetilacDAO.Obrisi(p.Id);
+            bool adresaSeKoristi = posetilacDAO.UcitajSve().Any(x => x.AdresaId == adresaId);
+            if (!adresaSeKoristi)
+                adresaDAO.Obrisi(adresaId);
+
+            Console.WriteLine($"Posetilac je obrisan (obrisano kupovina: {njegoveKupovine.Count}).");
         }
     }
 }
